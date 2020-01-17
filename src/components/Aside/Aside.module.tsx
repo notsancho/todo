@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Modal, Menu, Button, Input } from 'antd';
 import useForm from 'rc-form-hooks';
+import TextArea from 'antd/lib/input/TextArea';
 const FormItem = Form.Item;
 
 
@@ -54,6 +55,7 @@ const Aside: (React.FC) = props => {
 
 
                 <Form onSubmit={handleSubmit}>
+                    
                     <FormItem
                         label="Note"
                         labelCol={{ span: 4 }}
@@ -62,7 +64,7 @@ const Aside: (React.FC) = props => {
                         {getFieldDecorator('note', {
                             rules: [{ required: true, message: 'Please input your note!' }],
                         })(
-                            <Input />
+                            <TextArea />
                         )}
                     </FormItem>
                 </Form>
