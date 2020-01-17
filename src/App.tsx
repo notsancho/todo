@@ -1,26 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import localforage from "localforage";
+import ReactDOM from 'react-dom';
 import './App.css';
+import 'antd/dist/antd.css';
+import { Row, Col } from 'antd';
+import Aside from './components/Aside/Aside.module';
+import TodoList from './components/TodoList/TodoList.module';
 
-const App: React.FC = () => {
+const App: React.FC = props => {
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="wrap-todo">
+      <Row>
+        <Col span={18} push={6}>
+          <TodoList />
+        </Col>
+        <Col span={6} pull={18} className="wrap-aside">
+          <Aside />
+        </Col>
+      </Row>
     </div>
   );
-}
+};
 
 export default App;

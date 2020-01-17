@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import localForage from "localforage";
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
