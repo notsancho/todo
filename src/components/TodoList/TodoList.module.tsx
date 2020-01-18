@@ -2,7 +2,6 @@ import React, { useState, useEffect, forwardRef, Ref } from 'react';
 import { PageHeader, List, Card, Form, Modal, Menu, Button, Input, Slider } from 'antd';
 import localforage from "localforage";
 import useForm from 'rc-form-hooks';
-import { isObject } from 'util';
 import TextArea from 'antd/lib/input/TextArea';
 const FormItem = Form.Item;
 
@@ -38,6 +37,7 @@ const data = [
 
 const TodoList: (React.FC) = props => {
     const [showModal, setShowModal] = useState(false);
+    const [todoList, setTodoList] = useState((Array || Object));
 
     const { getFieldDecorator, validateFields, errors, values } = useForm<{
         title: string;

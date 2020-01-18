@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import localforage from "localforage";
-import ReactDOM from 'react-dom';
+import React, { useState, useEffect} from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
 import { Row, Col, Drawer } from 'antd';
@@ -8,13 +6,15 @@ import Aside from './components/Aside/Aside.module';
 import TodoList from './components/TodoList/TodoList.module';
 import {
   BrowserView,
-  MobileView,
-  isBrowser,
-  isMobile
+  MobileView
 } from "react-device-detect";
 
-const App: React.FC = props => {
-  const [heightMenu, setHeightMenu] = useState(window.innerHeight - 30);
+const App: (React.FC) = props => {
+  const [asideVisible, setAsideVisible] = useState(false);
+
+  const onCloseAside = () => {
+    setAsideVisible(!asideVisible);
+  };
 
   return (
     <div className="wrap-todo">
@@ -28,13 +28,14 @@ const App: React.FC = props => {
             <Aside />
           </Col>
         </BrowserView>
-        
+
         <MobileView>
           <TodoList />
           <Drawer
             title="Basic Drawer"
             placement="left"
-            visible={true}
+            onClose={onCloseAside}
+            visible={asideVisible}
           >
             <Aside />
           </Drawer>

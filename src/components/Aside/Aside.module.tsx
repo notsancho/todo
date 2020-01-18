@@ -8,7 +8,6 @@ import {
   } from "react-router-dom";
 import localforage from "localforage";
 import useForm from 'rc-form-hooks';
-import { isObject } from 'util';
 const FormItem = Form.Item;
 
 localforage.getItem('todosCategories').then((todosCategories) => {
