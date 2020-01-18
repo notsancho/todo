@@ -15,6 +15,7 @@
     "localforage": "^1.7.3",
     "rc-form-hooks": "0.0.1-beta.14",
     "react": "^16.12.0",
+    "react-device-detect": "^1.11.14",
     "react-dom": "^16.12.0",
     "react-localforage": "^1.0.1",
     "react-router-dom": "^5.1.2",
