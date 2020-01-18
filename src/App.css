@@ -1,6 +1,9 @@
 body, html, #root, .wrap-todo, .wrap-todo .ant-row, .ant-row .wrap-aside {
   height: 100%;
 }
+body{
+  padding: 10px;
+}
 .aside{
   height: 100%;
   position: relative;
