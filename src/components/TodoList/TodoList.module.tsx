@@ -1,9 +1,19 @@
 import React, { useState, useEffect, forwardRef, Ref } from 'react';
-import { PageHeader, List, Card, Form, Modal, Menu, Button, Input } from 'antd';
+import { PageHeader, List, Card, Form, Modal, Menu, Button, Input, Slider } from 'antd';
 import localforage from "localforage";
 import useForm from 'rc-form-hooks';
 import { isObject } from 'util';
+import TextArea from 'antd/lib/input/TextArea';
 const FormItem = Form.Item;
+
+
+const marks = {
+    0: '0',
+    25: '25',
+    50: '50',
+    75: '75',
+    100: '100'
+};
 
 const data = [
     {
@@ -30,7 +40,8 @@ const TodoList: (React.FC) = props => {
     const [showModal, setShowModal] = useState(false);
 
     const { getFieldDecorator, validateFields, errors, values } = useForm<{
-        categoryTitle: string;
+        title: string;
+        description: string;
     }>();
 
     const showModalAddTask = () => {
@@ -52,6 +63,10 @@ const TodoList: (React.FC) = props => {
                     border: '1px solid rgb(235, 237, 240)',
                 }}
                 title="Title"
+                extra={[
+                    <Button type="primary" key="0" icon="edit" />,
+                    <Button type="danger" key="1" icon="close" />,
+                  ]}
             />
 
             <List
@@ -72,7 +87,7 @@ const TodoList: (React.FC) = props => {
                 )}
             />
 
-            <Button type="primary" shape="circle" size="large" onClick={showModalAddTask}>Add</Button>
+            <Button type="primary" shape="circle" size="large" onClick={showModalAddTask} style={{float: 'right'}}>Add</Button>
 
             <Modal
                 title="Add task"
@@ -81,13 +96,26 @@ const TodoList: (React.FC) = props => {
                 onOk={handleSubmitForm}
             >
                 <Form onSubmit={handleSubmitForm}>
-                    <FormItem label="Task todo" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-                        {getFieldDecorator('categoryTitle', {
-                            rules: [{ required: true, message: 'Please input a category title (min: 3)', min: 3, max: 40 }],
+                    <FormItem label="Title" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+                        {getFieldDecorator('title', {
+                            rules: [{ required: true, message: 'Please input a task title (min: 3)', min: 3, max: 40 }],
                         })(
-                            <Input name="title" />
+                            <Input />
                         )}
                     </FormItem>
+
+                    <FormItem label="Description" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+                        {getFieldDecorator('description', {
+                            rules: [{ required: true, message: 'Please input a task description (min: 3)', min: 3, max: 40 }],
+                        })(
+                            <TextArea />
+                        )}
+                    </FormItem>
+
+                    <FormItem label="Priority level" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+                        <Slider marks={marks} defaultValue={50} step={5} />
+                    </FormItem>
+
                 </Form>
             </Modal>
 

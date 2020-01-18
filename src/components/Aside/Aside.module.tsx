@@ -1,5 +1,11 @@
 import React, { useState, useEffect, forwardRef, Ref } from 'react';
 import { Form, Modal, Menu, Button, Input } from 'antd';
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    Link
+  } from "react-router-dom";
 import localforage from "localforage";
 import useForm from 'rc-form-hooks';
 import { isObject } from 'util';
@@ -85,11 +91,17 @@ const Aside: (React.FC) = props => {
 
     return (
         <div className="aside">
+            <Router>
             <Menu mode="inline" style={{ height: heightMenu }}>
                 {todosCategories.map((array: any, key: number) => (
-                    <Menu.Item key={key}>{array.title}</Menu.Item>
+                    <Menu.Item key={key}>
+                        <Link to={`/tasklist/${array.id}`}>
+                            {array.title}
+                        </Link>
+                    </Menu.Item>
                 ))}
             </Menu>
+            </Router>
 
             <Button type="primary" className="add" onClick={showModalAddCategory}>
                 Add
