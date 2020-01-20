@@ -121,13 +121,20 @@ const TodoList: (React.FC) = (props) => {
                     xl: 3,
                     xxl: 3,
                 }}
-                dataSource={data}
-                renderItem={item => (
-                    <List.Item>
-                        <Card title={item.title}>Card content dgdsghsdgsfdghfdhgfsh  f dfjas hgsdfkj hkjh</Card>
-                    </List.Item>
-                )}
+                dataSource={[todoList]}
+                renderItem={item =>
+                    (todoList !== null) && todoList.map((array: any, key: number) => (
+                        <List.Item key={key}>
+                            <Card title={array.title}>Card content dgdsghsdgsfdghfdhgfsh  f dfjas hgsdfkj hkjh</Card>
+                        </List.Item>
+                    ))
+                } 
             />
+                {/* {(todoList !== null) && todoList.map((array: any, key: number) => (
+                        <List.Item key={key}>
+                            <Card title={array.title}>Card content dgdsghsdgsfdghfdhgfsh  f dfjas hgsdfkj hkjh</Card>
+                        </List.Item>
+                    ))} */}
 
             <Button type="primary" shape="circle" size="large" onClick={showModalAddTask} style={{ float: 'right' }}>Add</Button>
 
