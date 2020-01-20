@@ -3,8 +3,18 @@ import { PageHeader, List, Card, Form, Modal, Menu, Button, Input, Slider } from
 import localforage from "localforage";
 import useForm from 'rc-form-hooks';
 import TextArea from 'antd/lib/input/TextArea';
+import { withRouter } from "react-router";
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    useParams
+} from "react-router-dom";
 const FormItem = Form.Item;
 
+localforage.getItem('todoList').then((todoList) => {
+    console.log(todoList);
+});
 
 const marks = {
     0: '0',
@@ -35,9 +45,16 @@ const data = [
     },
 ];
 
-const TodoList: (React.FC) = props => {
+const TodoList: (React.FC) = (props) => {
     const [showModal, setShowModal] = useState(false);
-    const [todoList, setTodoList] = useState((Array || Object));
+    const [todoList, setTodoList] = useState<any>([]);
+    const { categoryId } = useParams();
+
+    useEffect(() => {
+        localforage.getItem('todoList').then((todoC: any) => {
+            setTodoList(todoC);
+        });
+    });
 
     const { getFieldDecorator, validateFields, errors, values } = useForm<{
         title: string;
@@ -52,8 +69,33 @@ const TodoList: (React.FC) = props => {
         setShowModal(!showModal);
     }
 
-    const handleSubmitForm = () => {
+    const handleSubmitForm = (e: React.FormEvent) => {
+        e.preventDefault();
+        validateFields()
+            .then(
+                (e) => addTask(e.title, e.description)
+            )
+            .catch(
+                e => console.error(e.message)
+            );
+    };
 
+    const addTask = (title:string, description:string) => {
+        let a = todoList || [];
+        const nn = {
+            id: Date.now() + Math.random(),
+            categoryId: categoryId,
+            title: title,
+            description: description,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        };
+        a.push(nn);
+
+        setTodoList(a);
+        localforage.setItem("todoList", a);
+
+        setShowModal(!showModal);
     }
 
     return (
@@ -66,7 +108,7 @@ const TodoList: (React.FC) = props => {
                 extra={[
                     <Button type="primary" key="0" icon="edit" />,
                     <Button type="danger" key="1" icon="close" />,
-                  ]}
+                ]}
             />
 
             <List
@@ -87,7 +129,7 @@ const TodoList: (React.FC) = props => {
                 )}
             />
 
-            <Button type="primary" shape="circle" size="large" onClick={showModalAddTask} style={{float: 'right'}}>Add</Button>
+            <Button type="primary" shape="circle" size="large" onClick={showModalAddTask} style={{ float: 'right' }}>Add</Button>
 
             <Modal
                 title="Add task"
@@ -123,4 +165,4 @@ const TodoList: (React.FC) = props => {
     );
 }
 
-export default TodoList;
+export default withRouter(TodoList);

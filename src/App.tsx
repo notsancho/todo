@@ -1,9 +1,14 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
 import { Row, Col, Drawer } from 'antd';
 import Aside from './components/Aside/Aside.module';
 import TodoList from './components/TodoList/TodoList.module';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+} from "react-router-dom";
 import {
   BrowserView,
   MobileView
@@ -18,30 +23,34 @@ const App: (React.FC) = props => {
 
   return (
     <div className="wrap-todo">
-      <Row>
+      <Router>
+        <Row>
 
-        <BrowserView>
-          <Col span={18} push={6}>
+          <BrowserView>
+            <Col span={18} push={6}>
+              <Route path="/tasklist/:categoryId">
+                <TodoList />
+              </Route>
+            </Col>
+            <Col span={6} pull={18} className="wrap-aside">
+              <Aside />
+            </Col>
+          </BrowserView>
+
+          <MobileView>
             <TodoList />
-          </Col>
-          <Col span={6} pull={18} className="wrap-aside">
-            <Aside />
-          </Col>
-        </BrowserView>
+            <Drawer
+              title="Basic Drawer"
+              placement="left"
+              onClose={onCloseAside}
+              visible={asideVisible}
+            >
+              <Aside />
+            </Drawer>
+          </MobileView>
 
-        <MobileView>
-          <TodoList />
-          <Drawer
-            title="Basic Drawer"
-            placement="left"
-            onClose={onCloseAside}
-            visible={asideVisible}
-          >
-            <Aside />
-          </Drawer>
-        </MobileView>
-
-      </Row>
+        </Row>
+      </Router>
     </div>
   );
 };

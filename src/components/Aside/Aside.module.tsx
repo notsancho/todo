@@ -5,7 +5,7 @@ import {
     Switch,
     Route,
     Link
-  } from "react-router-dom";
+} from "react-router-dom";
 import localforage from "localforage";
 import useForm from 'rc-form-hooks';
 const FormItem = Form.Item;
@@ -17,7 +17,7 @@ localforage.getItem('todosCategories').then((todosCategories) => {
 const Aside: (React.FC) = props => {
     const [heightMenu, setHeightMenu] = useState(window.innerHeight - 30);
     const [showModal, setShowModal] = useState(false);
-    const [todosCategories, setTodosCategories] = useState((Array || Object));
+    const [todosCategories, setTodosCategories] = useState<any>([]);
 
     useEffect(() => {
         localforage.getItem('todosCategories').then((todoC: any) => {
@@ -53,6 +53,9 @@ const Aside: (React.FC) = props => {
     }
 
     const checkCategory = (title: string) => {
+        if (todosCategories === null) {
+            return false;
+        }
         const titleTrim = title.trim();
         return todosCategories.some((obj: any) => {
             return obj.title === titleTrim;
@@ -67,8 +70,8 @@ const Aside: (React.FC) = props => {
                     title: 'Error',
                     content: 'A category with the same title already exists.',
                 });
-            }else{
-                let a = todosCategories;
+            } else {
+                let a = todosCategories || [];
                 const nn = {
                     id: Date.now() + Math.random(),
                     title: categoryTitle,
@@ -91,15 +94,15 @@ const Aside: (React.FC) = props => {
     return (
         <div className="aside">
             <Router>
-            <Menu mode="inline" style={{ height: heightMenu }}>
-                {todosCategories.map((array: any, key: number) => (
-                    <Menu.Item key={key}>
-                        <Link to={`/tasklist/${array.id}`}>
-                            {array.title}
-                        </Link>
-                    </Menu.Item>
-                ))}
-            </Menu>
+                <Menu mode="inline" style={{ height: heightMenu }}>
+                    {(todosCategories !== null) && todosCategories.map((array: any, key: number) => (
+                        <Menu.Item key={key}>
+                            <Link to={`/tasklist/${array.id}`}>
+                                {array.title}
+                            </Link>
+                        </Menu.Item>
+                    ))}
+                </Menu>
             </Router>
 
             <Button type="primary" className="add" onClick={showModalAddCategory}>
