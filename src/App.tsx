@@ -28,9 +28,11 @@ const App: (React.FC) = props => {
 
           <BrowserView>
             <Col span={18} push={6}>
-              <Route path="/tasklist/:categoryId">
+            <Switch>
+              <Route exact path="/tasklist/:categoryId">
                 <TodoList />
               </Route>
+              </Switch>
             </Col>
             <Col span={6} pull={18} className="wrap-aside">
               <Aside />

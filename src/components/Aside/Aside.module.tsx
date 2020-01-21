@@ -93,7 +93,6 @@ const Aside: (React.FC) = props => {
 
     return (
         <div className="aside">
-            <Router>
                 <Menu mode="inline" style={{ height: heightMenu }}>
                     {(todosCategories !== null) && todosCategories.map((array: any, key: number) => (
                         <Menu.Item key={key}>
@@ -103,7 +102,6 @@ const Aside: (React.FC) = props => {
                         </Menu.Item>
                     ))}
                 </Menu>
-            </Router>
 
             <Button type="primary" className="add" onClick={showModalAddCategory}>
                 Add

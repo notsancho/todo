@@ -1,5 +1,5 @@
 import React, { useState, useEffect, forwardRef, Ref } from 'react';
-import { PageHeader, List, Card, Form, Modal, Menu, Button, Input, Slider } from 'antd';
+import { PageHeader, List, Card, Form, Modal, Menu, Button, Input, Slider, Row, Col } from 'antd';
 import localforage from "localforage";
 import useForm from 'rc-form-hooks';
 import TextArea from 'antd/lib/input/TextArea';
@@ -10,49 +10,41 @@ import {
     Route,
     useParams
 } from "react-router-dom";
+import ModalTask from '../ModalTask/ModalTask.module';
 const FormItem = Form.Item;
 
-localforage.getItem('todoList').then((todoList) => {
+//localforage.setItem("todoList", []);
+
+localforage.getItem('todoList').then((todoList: any) => {
+    //console.log('by date:');
     console.log(todoList);
 });
 
-const marks = {
-    0: '0',
-    25: '25',
-    50: '50',
-    75: '75',
-    100: '100'
-};
-
-const data = [
-    {
-        title: 'Title 1',
-    },
-    {
-        title: 'Title 2',
-    },
-    {
-        title: 'Title 3',
-    },
-    {
-        title: 'Title 4',
-    },
-    {
-        title: 'Title 5',
-    },
-    {
-        title: 'Title 6',
-    },
-];
-
 const TodoList: (React.FC) = (props) => {
-    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState<boolean>(false);
     const [todoList, setTodoList] = useState<any>([]);
+    const [categoryTitle, setCategoryTitle] = useState<string>();
+    const [title, setTitle] = useState<string>('');
+    const [description, setDescription] = useState<string>('');
+    const [priorityLevel, setPriorityLevel] = useState<any>(50);
+    const [taskId, setTaskId] = useState<number | null>();
+    const [todosCategories, setTodosCategories] = useState<any>([]);
     const { categoryId } = useParams();
 
     useEffect(() => {
         localforage.getItem('todoList').then((todoC: any) => {
             setTodoList(todoC);
+        });
+    }, []);
+
+    useEffect(() => {
+        localforage.getItem('todosCategories').then((todoC: any) => {
+            todoC.some((array: any, key: number) => {
+                if (array.id == categoryId) {
+                    setCategoryTitle(array.title);
+                    console.log(array.title);
+                }
+            });
         });
     });
 
@@ -62,6 +54,10 @@ const TodoList: (React.FC) = (props) => {
     }>();
 
     const showModalAddTask = () => {
+        setTaskId(null);
+        setTitle("");
+        setDescription("");
+        setPriorityLevel(50);
         setShowModal(!showModal);
     }
 
@@ -69,104 +65,154 @@ const TodoList: (React.FC) = (props) => {
         setShowModal(!showModal);
     }
 
-    const handleSubmitForm = (e: React.FormEvent) => {
-        e.preventDefault();
-        validateFields()
-            .then(
-                (e) => addTask(e.title, e.description)
-            )
-            .catch(
-                e => console.error(e.message)
-            );
-    };
+    const addTask = (title: string, description: string) => {
 
-    const addTask = (title:string, description:string) => {
-        let a = todoList || [];
-        const nn = {
-            id: Date.now() + Math.random(),
-            categoryId: categoryId,
-            title: title,
-            description: description,
-            createdAt: Date.now(),
-            updatedAt: Date.now()
-        };
-        a.push(nn);
+        let ar = todoList || [];
 
-        setTodoList(a);
-        localforage.setItem("todoList", a);
+        if (taskId !== null) {
+            ar.some((array: any, key: number) => {
+                if (array.id == taskId) {
+                    ar[key] = {
+                        id: taskId || Date.now() + Math.random(),
+                        categoryId: categoryId,
+                        title: title,
+                        description: description,
+                        priorityLevel: priorityLevel,
+                        createdAt: array.createdAt,
+                        updatedAt: Date.now()
+                    };
+                    //delete ar[key];
+                }
+            });
+        } else {
+            const nn = {
+                id: taskId || Date.now() + Math.random(),
+                categoryId: categoryId,
+                title: title,
+                description: description,
+                priorityLevel: priorityLevel,
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            };
+            ar.push(nn);
+        }
+
+        ar = ar.filter(function (el: any) {
+            return el != null;
+        });
+
+        let byPriorityLevel = ar.slice(0);
+        byPriorityLevel.sort(function (a: any, b: any) {
+            return b.priorityLevel - a.priorityLevel;
+        });
+
+        setTodoList(byPriorityLevel);
+        localforage.setItem("todoList", byPriorityLevel);
 
         setShowModal(!showModal);
+    }
+
+    const editTask = (id: number) => {
+        todoList.some((array: any, key: number) => {
+            if (array.id == id) {
+                setTaskId(id);
+                setTitle(array.title);
+                setDescription(array.description);
+                setPriorityLevel(array.priorityLevel);
+                return array;
+            }
+        });
+
+        setShowModal(!showModal);
+    }
+
+    const removeTask = (id: number): void => {
+        todoList.some((array: any, key: number) => {
+            if (array.id == id) {
+                delete todoList[key];
+            }
+        });
+
+        const todoListFilter = todoList.filter(function (el: any) {
+            return el != null;
+        });
+
+        setTodoList(todoListFilter);
+        localforage.setItem("todoList", todoListFilter);
+        //setShowModal(!showModal);
+    }
+
+    const confirmRemoveTask = (id: number) => {
+        Modal.confirm({
+            title: 'Confirm',
+            content: 'The task will be deleted. Are you shure?',
+            okText: 'Confirm',
+            cancelText: 'Cancel',
+            onOk() {
+                removeTask(id);
+            },
+            onCancel() {
+            },
+        });
+    }
+
+    const onChangeSlider = (value: any) => {
+
     }
 
     return (
         <div>
             <PageHeader
-                style={{
-                    border: '1px solid rgb(235, 237, 240)',
-                }}
-                title="Title"
-                extra={[
-                    <Button type="primary" key="0" icon="edit" />,
-                    <Button type="danger" key="1" icon="close" />,
-                ]}
-            />
+                    style={{
+                        border: '1px solid rgb(235, 237, 240)',
+                    }}
+                    title={categoryTitle}
+                    extra={[
+                        <Button type="primary" key="0" icon="edit" />,
+                        <Button type="danger" key="1" icon="close" />,
+                    ]}
+                />
 
-            <List
-                grid={{
-                    gutter: 16,
-                    xs: 1,
-                    sm: 2,
-                    md: 4,
-                    lg: 4,
-                    xl: 3,
-                    xxl: 3,
-                }}
-                dataSource={[todoList]}
-                renderItem={item =>
-                    (todoList !== null) && todoList.map((array: any, key: number) => (
-                        <List.Item key={key}>
-                            <Card title={array.title}>Card content dgdsghsdgsfdghfdhgfsh  f dfjas hgsdfkj hkjh</Card>
-                        </List.Item>
-                    ))
-                } 
-            />
-                {/* {(todoList !== null) && todoList.map((array: any, key: number) => (
-                        <List.Item key={key}>
-                            <Card title={array.title}>Card content dgdsghsdgsfdghfdhgfsh  f dfjas hgsdfkj hkjh</Card>
-                        </List.Item>
-                    ))} */}
+
+            <Row gutter={[16, 16]}>
+                {(todoList !== null) && todoList.map((array: any, key: number) => {
+                    if (array.categoryId == categoryId) {
+                        return (<Col span={6} key={key}>
+                            <Card
+                                title={
+                                    array.title
+                                }
+                                extra={[
+                                    <Button type="primary" key="0" icon="edit" onClick={() => { editTask(array.id) }} />,
+                                    <Button type="danger" key="1" icon="close" onClick={() => { confirmRemoveTask(array.id) }} />
+                                ]}
+                            >
+                                priorityLevel: {array.priorityLevel}<br />
+                                description: {array.description}<br />
+                                createdAt: {array.createdAt}<br />
+                                updatedAt: {array.updatedAt}<br />
+                            </Card>
+                        </Col>);
+                    }
+                    return false;
+                })}
+            </Row>
 
             <Button type="primary" shape="circle" size="large" onClick={showModalAddTask} style={{ float: 'right' }}>Add</Button>
 
-            <Modal
-                title="Add task"
-                visible={showModal}
-                onCancel={handleCancelModal}
-                onOk={handleSubmitForm}
-            >
-                <Form onSubmit={handleSubmitForm}>
-                    <FormItem label="Title" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-                        {getFieldDecorator('title', {
-                            rules: [{ required: true, message: 'Please input a task title (min: 3)', min: 3, max: 40 }],
-                        })(
-                            <Input />
-                        )}
-                    </FormItem>
-
-                    <FormItem label="Description" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-                        {getFieldDecorator('description', {
-                            rules: [{ required: true, message: 'Please input a task description (min: 3)', min: 3, max: 40 }],
-                        })(
-                            <TextArea />
-                        )}
-                    </FormItem>
-
-                    <FormItem label="Priority level" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-                        <Slider marks={marks} defaultValue={50} step={5} />
-                    </FormItem>
-
-                </Form>
-            </Modal>
+            {showModal && (
+                <ModalTask
+                    title={title}
+                    description={description}
+                    priorityLevel={priorityLevel}
+                    showModal={showModal}
+                    handleCancelModal={handleCancelModal}
+                    addTask={addTask}
+                    setPriorityLevel={setPriorityLevel}
+                    setTitle={setTitle}
+                    setDescription={setDescription}
+                />
+            )}
 
         </div>
     );
