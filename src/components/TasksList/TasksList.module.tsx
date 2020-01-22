@@ -1,52 +1,45 @@
-import React, { useState, useEffect, forwardRef, Ref } from 'react';
-import { PageHeader, List, Card, Form, Modal, Menu, Button, Input, Slider, Row, Col } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { PageHeader, Card, Modal, Button, Row, Col } from 'antd';
 import localforage from "localforage";
 import useForm from 'rc-form-hooks';
-import TextArea from 'antd/lib/input/TextArea';
 import { withRouter } from "react-router";
 import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
     useParams
 } from "react-router-dom";
 import ModalTask from '../ModalTask/ModalTask.module';
-const FormItem = Form.Item;
 
-//localforage.setItem("todoList", []);
+interface TasksListProps {
+    categoryTitle: string,
+    setCategoryTitle: any,
+    categoriesList: any,
+    setCategoriesList: any,
+    showCategoryForm: any,
+}
 
-localforage.getItem('todoList').then((todoList: any) => {
-    //console.log('by date:');
-    console.log(todoList);
-});
-
-const TodoList: (React.FC) = (props) => {
+const TasksList = (props:any) => {
     const [showModal, setShowModal] = useState<boolean>(false);
-    const [todoList, setTodoList] = useState<any>([]);
-    const [categoryTitle, setCategoryTitle] = useState<string>();
+
+    const [tasksList, setTasksList] = useState<any>([]);
+
+    const [taskId, setTaskId] = useState<number | null>();
     const [title, setTitle] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const [priorityLevel, setPriorityLevel] = useState<any>(50);
-    const [taskId, setTaskId] = useState<number | null>();
-    const [todosCategories, setTodosCategories] = useState<any>([]);
+
     const { categoryId } = useParams();
 
-    useEffect(() => {
-        localforage.getItem('todoList').then((todoC: any) => {
-            setTodoList(todoC);
-        });
-    }, []);
+    localforage.getItem('tasksList').then((list: any) => {
+        setTasksList(list);
+    });
 
     useEffect(() => {
-        localforage.getItem('todosCategories').then((todoC: any) => {
-            todoC.some((array: any, key: number) => {
-                if (array.id == categoryId) {
-                    setCategoryTitle(array.title);
-                    console.log(array.title);
-                }
-            });
+        props.categoriesList.some((array: any, key: number) => {
+            if (array.id == categoryId) {
+                props.setCategoryTitle(array.title);
+            }
         });
-    });
+    }, [categoryId, props]);
+    
 
     const { getFieldDecorator, validateFields, errors, values } = useForm<{
         title: string;
@@ -67,12 +60,12 @@ const TodoList: (React.FC) = (props) => {
 
     const addTask = (title: string, description: string) => {
 
-        let ar = todoList || [];
+        let list = tasksList || [];
 
         if (taskId !== null) {
-            ar.some((array: any, key: number) => {
+            list.some((array: any, key: number) => {
                 if (array.id == taskId) {
-                    ar[key] = {
+                    list[key] = {
                         id: taskId || Date.now() + Math.random(),
                         categoryId: categoryId,
                         title: title,
@@ -81,11 +74,10 @@ const TodoList: (React.FC) = (props) => {
                         createdAt: array.createdAt,
                         updatedAt: Date.now()
                     };
-                    //delete ar[key];
                 }
             });
         } else {
-            const nn = {
+            const newTask = {
                 id: taskId || Date.now() + Math.random(),
                 categoryId: categoryId,
                 title: title,
@@ -94,26 +86,26 @@ const TodoList: (React.FC) = (props) => {
                 createdAt: Date.now(),
                 updatedAt: Date.now()
             };
-            ar.push(nn);
+            list.push(newTask);
         }
 
-        ar = ar.filter(function (el: any) {
+        list = list.filter(function (el: any) {
             return el != null;
         });
 
-        let byPriorityLevel = ar.slice(0);
+        let byPriorityLevel = list.slice(0);
         byPriorityLevel.sort(function (a: any, b: any) {
             return b.priorityLevel - a.priorityLevel;
         });
 
-        setTodoList(byPriorityLevel);
-        localforage.setItem("todoList", byPriorityLevel);
+        setTasksList(byPriorityLevel);
+        localforage.setItem("tasksList", byPriorityLevel);
 
         setShowModal(!showModal);
     }
 
     const editTask = (id: number) => {
-        todoList.some((array: any, key: number) => {
+        tasksList.some((array: any, key: number) => {
             if (array.id == id) {
                 setTaskId(id);
                 setTitle(array.title);
@@ -127,19 +119,18 @@ const TodoList: (React.FC) = (props) => {
     }
 
     const removeTask = (id: number): void => {
-        todoList.some((array: any, key: number) => {
+        tasksList.some((array: any, key: number) => {
             if (array.id == id) {
-                delete todoList[key];
+                delete tasksList[key];
             }
         });
 
-        const todoListFilter = todoList.filter(function (el: any) {
+        const tasksListFilter = tasksList.filter(function (el: any) {
             return el != null;
         });
 
-        setTodoList(todoListFilter);
-        localforage.setItem("todoList", todoListFilter);
-        //setShowModal(!showModal);
+        setTasksList(tasksListFilter);
+        localforage.setItem("tasksList", tasksListFilter);
     }
 
     const confirmRemoveTask = (id: number) => {
@@ -156,8 +147,43 @@ const TodoList: (React.FC) = (props) => {
         });
     }
 
-    const onChangeSlider = (value: any) => {
+    const removeCategory = (): void => {
+        props.categoriesList.some((array: any, key: number) => {
+            if (array.id == categoryId) {
+                delete props.categoriesList[key];
+            }
+        });
+        const categoriesListFilter = props.categoriesList.filter(function (el: any) {
+            return el != null;
+        });
+        props.setCategoriesList(categoriesListFilter);
+        localforage.setItem("categoriesList", categoriesListFilter);
 
+
+        tasksList.some((array: any, key: number) => {
+            if (array.categoryId == categoryId) {
+                delete tasksList[key];
+            }
+        });
+        const tasksListFilter = tasksList.filter(function (el: any) {
+            return el != null;
+        });
+        setTasksList(tasksListFilter);
+        localforage.setItem("tasksList", tasksListFilter);
+    }
+
+    const confirmRemoveCategory = () => {
+        Modal.confirm({
+            title: 'Confirm',
+            content: 'The category will be deleted. Are you shure?',
+            okText: 'Confirm',
+            cancelText: 'Cancel',
+            onOk() {
+                removeCategory();
+            },
+            onCancel() {
+            },
+        });
     }
 
     return (
@@ -166,16 +192,16 @@ const TodoList: (React.FC) = (props) => {
                     style={{
                         border: '1px solid rgb(235, 237, 240)',
                     }}
-                    title={categoryTitle}
+                    title={props.categoryTitle}
                     extra={[
-                        <Button type="primary" key="0" icon="edit" />,
-                        <Button type="danger" key="1" icon="close" />,
+                        <Button type="primary" key="0" icon="edit" onClick={() => { props.showCategoryForm(categoryId) }} />,
+                        <Button type="danger" key="1" icon="close" onClick={() => { confirmRemoveCategory() }} />
                     ]}
                 />
 
 
             <Row gutter={[16, 16]}>
-                {(todoList !== null) && todoList.map((array: any, key: number) => {
+                {(tasksList !== null) && tasksList.map((array: any, key: number) => {
                     if (array.categoryId == categoryId) {
                         return (<Col span={6} key={key}>
                             <Card
@@ -218,4 +244,4 @@ const TodoList: (React.FC) = (props) => {
     );
 }
 
-export default withRouter(TodoList);
+export default withRouter(TasksList);

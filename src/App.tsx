@@ -3,7 +3,9 @@ import './App.css';
 import 'antd/dist/antd.css';
 import { Row, Col, Drawer } from 'antd';
 import Aside from './components/Aside/Aside.module';
-import TodoList from './components/TodoList/TodoList.module';
+import TasksList from './components/TasksList/TasksList.module';
+import ModalCategory from './components/ModalCategory/ModalCategory.module';
+import localforage from "localforage";
 import {
   BrowserRouter as Router,
   Switch,
@@ -14,45 +16,134 @@ import {
   MobileView
 } from "react-device-detect";
 
+
 const App: (React.FC) = props => {
   const [asideVisible, setAsideVisible] = useState(false);
 
-  const onCloseAside = () => {
-    setAsideVisible(!asideVisible);
-  };
+  const [showModalCategory, setShowModalCategory] = useState(false);
+
+  const [categoriesList, setCategoriesList] = useState<any>([]);
+
+  const [categoryModalTitle, setCategoryModalTitle] = useState<string>('');
+  const [categoryTitle, setCategoryTitle] = useState<string>('');
+  const [categoryId, setCategoryId] = useState<number|null>(null);
+
+  useEffect(() => {
+    localforage.getItem('categoriesList').then((list: any) => {
+
+      const categoriesList = list || [];
+
+      console.log(categoriesList, '111');
+
+      setCategoriesList(categoriesList);
+
+    });
+
+  }, []);
+
+  const showCategoryForm = (id: number|null) => {
+    if (id === null) {
+      setCategoryModalTitle("");
+    } else {
+      setCategoryModalTitle(categoryTitle);
+    }
+    setCategoryId(id);
+    setShowModalCategory(!showModalCategory);
+  }
+
 
   return (
     <div className="wrap-todo">
       <Router>
+
         <Row>
 
           <BrowserView>
             <Col span={18} push={6}>
-            <Switch>
-              <Route exact path="/tasklist/:categoryId">
-                <TodoList />
-              </Route>
+
+              <Switch>
+                <Route exact path="/tasklist/:categoryId">
+
+                  {() => {
+                    if (categoriesList.length) {
+                      return <TasksList
+                        categoryTitle={categoryTitle}
+                        setCategoryTitle={setCategoryTitle}
+                        categoriesList={categoriesList}
+                        setCategoriesList={setCategoriesList}
+                        showCategoryForm={showCategoryForm}
+                      />
+                    }
+                  }}
+
+
+                </Route>
               </Switch>
+
+
+
             </Col>
             <Col span={6} pull={18} className="wrap-aside">
-              <Aside />
+
+              <Aside
+                categoriesList={categoriesList}
+                setCategoriesList={setCategoriesList}
+                showCategoryForm={showCategoryForm}
+              />
+
             </Col>
           </BrowserView>
 
           <MobileView>
-            <TodoList />
+
+            <Switch>
+              <Route exact path="/tasklist/:categoryId">
+
+                {() => {
+                  if (categoriesList.length) {
+                    return <TasksList
+                      categoryTitle={categoryTitle}
+                      setCategoryTitle={setCategoryTitle}
+                      categoriesList={categoriesList}
+                      setCategoriesList={setCategoriesList}
+                      showCategoryForm={showCategoryForm}
+                    />
+                  }
+                }}
+
+              </Route>
+            </Switch>
+
             <Drawer
-              title="Basic Drawer"
               placement="left"
-              onClose={onCloseAside}
+              onClose={() => setAsideVisible(!asideVisible)}
               visible={asideVisible}
             >
-              <Aside />
+              <Aside
+                categoriesList={categoriesList}
+                setCategoriesList={setCategoriesList}
+                showCategoryForm={showCategoryForm}
+              />
             </Drawer>
           </MobileView>
 
         </Row>
       </Router>
+
+      {showModalCategory && (
+        <ModalCategory
+        categoryModalTitle={categoryModalTitle}
+        categoryId={categoryId}
+        setCategoryId={setCategoryId}
+        showModalCategory={showModalCategory}
+        setShowModalCategory={setShowModalCategory}
+        categoriesList={categoriesList}
+        setCategoriesList={setCategoriesList}
+        categoryTitle={categoryTitle}
+        setCategoryTitle={setCategoryTitle}
+      />
+      )}
+
     </div>
   );
 };

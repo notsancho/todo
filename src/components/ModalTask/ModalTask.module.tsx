@@ -1,11 +1,11 @@
-import React, { useState, useEffect, forwardRef, Ref } from 'react';
-import { PageHeader, List, Card, Form, Modal, Menu, Button, Input, Slider, Row, Col } from 'antd';
+import React from 'react';
+import { Form, Modal, Input, Slider } from 'antd';
 
 import useForm from 'rc-form-hooks';
 import TextArea from 'antd/lib/input/TextArea';
 const FormItem = Form.Item;
 
-interface HooksProps {
+interface ModalTaskProps {
     title: string,
     description: string,
     priorityLevel: number,
@@ -25,8 +25,7 @@ const marks = {
     100: '100'
 };
 
-const ModalTask = (props:HooksProps) => {
-    const [igor, setIgor] = useState("");
+const ModalTask = (props:ModalTaskProps) => {
 
     const { getFieldDecorator, validateFields, errors, values } = useForm<{
         title: string;
@@ -64,8 +63,6 @@ const ModalTask = (props:HooksProps) => {
                         <Input onChange={(e)=>{props.setTitle(e.target.value)}} />
                     )}
                 </FormItem>
-
-                
 
                 <FormItem label="Description" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
                     {getFieldDecorator('description', {
