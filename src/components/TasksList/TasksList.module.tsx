@@ -41,12 +41,12 @@ const TasksList = (props:any) => {
     }, [categoryId, props]);
     
 
-    const { getFieldDecorator, validateFields, errors, values } = useForm<{
-        title: string;
-        description: string;
-    }>();
+    // const { getFieldDecorator, validateFields, errors, values } = useForm<{
+    //     title: string;
+    //     description?: string;
+    // }>();
 
-    const showModalAddTask = () => {
+    const showModalSaveTask = (): void => {
         setTaskId(null);
         setTitle("");
         setDescription("");
@@ -54,39 +54,51 @@ const TasksList = (props:any) => {
         setShowModal(!showModal);
     }
 
-    const handleCancelModal = () => {
+    const handleCancelModal = (): void => {
         setShowModal(!showModal);
     }
 
-    const addTask = (title: string, description: string) => {
+    const createTask = (list: any, title: string, description: string = ''): object => {
+        const newTask = {
+            id: taskId || Date.now() + Math.random(),
+            categoryId: categoryId,
+            title: title,
+            description: description,
+            priorityLevel: priorityLevel,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        };
+        list.push(newTask);
+
+        return list;
+    }
+
+    const updateTask = (list: any, title: string, description: string): object => {
+        list.some((array: any, key: number) => {
+            if (array.id == taskId) {
+                list[key] = {
+                    id: taskId || Date.now() + Math.random(),
+                    categoryId: categoryId,
+                    title: title,
+                    description: description,
+                    priorityLevel: priorityLevel,
+                    createdAt: array.createdAt,
+                    updatedAt: Date.now()
+                };
+            }
+        });
+
+        return list;
+    }
+
+    const saveTask = (title: string, description: string) => {
 
         let list = tasksList || [];
 
         if (taskId !== null) {
-            list.some((array: any, key: number) => {
-                if (array.id == taskId) {
-                    list[key] = {
-                        id: taskId || Date.now() + Math.random(),
-                        categoryId: categoryId,
-                        title: title,
-                        description: description,
-                        priorityLevel: priorityLevel,
-                        createdAt: array.createdAt,
-                        updatedAt: Date.now()
-                    };
-                }
-            });
+            list = updateTask(list, title, description);
         } else {
-            const newTask = {
-                id: taskId || Date.now() + Math.random(),
-                categoryId: categoryId,
-                title: title,
-                description: description,
-                priorityLevel: priorityLevel,
-                createdAt: Date.now(),
-                updatedAt: Date.now()
-            };
-            list.push(newTask);
+            list = createTask(list, title, description);
         }
 
         list = list.filter(function (el: any) {
@@ -104,7 +116,7 @@ const TasksList = (props:any) => {
         setShowModal(!showModal);
     }
 
-    const editTask = (id: number) => {
+    const editTask = (id: number): void => {
         tasksList.some((array: any, key: number) => {
             if (array.id == id) {
                 setTaskId(id);
@@ -118,7 +130,7 @@ const TasksList = (props:any) => {
         setShowModal(!showModal);
     }
 
-    const removeTask = (id: number): void => {
+    const deleteTask = (id: number): void => {
         tasksList.some((array: any, key: number) => {
             if (array.id == id) {
                 delete tasksList[key];
@@ -133,21 +145,21 @@ const TasksList = (props:any) => {
         localforage.setItem("tasksList", tasksListFilter);
     }
 
-    const confirmRemoveTask = (id: number) => {
+    const confirmDeleteTask = (id: number): void => {
         Modal.confirm({
             title: 'Confirm',
             content: 'The task will be deleted. Are you shure?',
             okText: 'Confirm',
             cancelText: 'Cancel',
             onOk() {
-                removeTask(id);
+                deleteTask(id);
             },
             onCancel() {
             },
         });
     }
 
-    const removeCategory = (): void => {
+    const deleteCategory = (): void => {
         props.categoriesList.some((array: any, key: number) => {
             if (array.id == categoryId) {
                 delete props.categoriesList[key];
@@ -172,14 +184,14 @@ const TasksList = (props:any) => {
         localforage.setItem("tasksList", tasksListFilter);
     }
 
-    const confirmRemoveCategory = () => {
+    const confirmDeleteCategory = (): void => {
         Modal.confirm({
             title: 'Confirm',
             content: 'The category will be deleted. Are you shure?',
             okText: 'Confirm',
             cancelText: 'Cancel',
             onOk() {
-                removeCategory();
+                deleteCategory();
             },
             onCancel() {
             },
@@ -195,7 +207,7 @@ const TasksList = (props:any) => {
                     title={props.categoryTitle}
                     extra={[
                         <Button type="primary" key="0" icon="edit" onClick={() => { props.showCategoryForm(categoryId) }} />,
-                        <Button type="danger" key="1" icon="close" onClick={() => { confirmRemoveCategory() }} />
+                        <Button type="danger" key="1" icon="close" onClick={() => { confirmDeleteCategory() }} />
                     ]}
                 />
 
@@ -210,7 +222,7 @@ const TasksList = (props:any) => {
                                 }
                                 extra={[
                                     <Button type="primary" key="0" icon="edit" onClick={() => { editTask(array.id) }} />,
-                                    <Button type="danger" key="1" icon="close" onClick={() => { confirmRemoveTask(array.id) }} />
+                                    <Button type="danger" key="1" icon="close" onClick={() => { confirmDeleteTask(array.id) }} />
                                 ]}
                             >
                                 priorityLevel: {array.priorityLevel}<br />
@@ -224,7 +236,7 @@ const TasksList = (props:any) => {
                 })}
             </Row>
 
-            <Button type="primary" shape="circle" size="large" onClick={showModalAddTask} style={{ float: 'right' }}>Add</Button>
+            <Button type="primary" shape="circle" size="large" onClick={showModalSaveTask} style={{ float: 'right' }}>Add</Button>
 
             {showModal && (
                 <ModalTask
@@ -233,7 +245,7 @@ const TasksList = (props:any) => {
                     priorityLevel={priorityLevel}
                     showModal={showModal}
                     handleCancelModal={handleCancelModal}
-                    addTask={addTask}
+                    saveTask={saveTask}
                     setPriorityLevel={setPriorityLevel}
                     setTitle={setTitle}
                     setDescription={setDescription}

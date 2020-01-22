@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import { Row, Col, Drawer } from 'antd';
+import { Row, Col, Drawer, Button } from 'antd';
 import Aside from './components/Aside/Aside.module';
 import TasksList from './components/TasksList/TasksList.module';
 import ModalCategory from './components/ModalCategory/ModalCategory.module';
@@ -26,22 +26,17 @@ const App: (React.FC) = props => {
 
   const [categoryModalTitle, setCategoryModalTitle] = useState<string>('');
   const [categoryTitle, setCategoryTitle] = useState<string>('');
-  const [categoryId, setCategoryId] = useState<number|null>(null);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
 
   useEffect(() => {
     localforage.getItem('categoriesList').then((list: any) => {
-
       const categoriesList = list || [];
-
-      console.log(categoriesList, '111');
-
       setCategoriesList(categoriesList);
-
     });
 
   }, []);
 
-  const showCategoryForm = (id: number|null) => {
+  const showCategoryForm = (id: number | null) => {
     if (id === null) {
       setCategoryModalTitle("");
     } else {
@@ -55,15 +50,11 @@ const App: (React.FC) = props => {
   return (
     <div className="wrap-todo">
       <Router>
-
         <Row>
-
           <BrowserView>
             <Col span={18} push={6}>
-
               <Switch>
                 <Route exact path="/tasklist/:categoryId">
-
                   {() => {
                     if (categoriesList.length) {
                       return <TasksList
@@ -75,30 +66,25 @@ const App: (React.FC) = props => {
                       />
                     }
                   }}
-
-
                 </Route>
               </Switch>
-
-
-
             </Col>
             <Col span={6} pull={18} className="wrap-aside">
-
               <Aside
                 categoriesList={categoriesList}
                 setCategoriesList={setCategoriesList}
                 showCategoryForm={showCategoryForm}
               />
-
             </Col>
           </BrowserView>
-
           <MobileView>
+            
+            <Button type="primary" onClick={() => setAsideVisible(!asideVisible)}>
+            Show categories
+            </Button>
 
             <Switch>
               <Route exact path="/tasklist/:categoryId">
-
                 {() => {
                   if (categoriesList.length) {
                     return <TasksList
@@ -110,7 +96,6 @@ const App: (React.FC) = props => {
                     />
                   }
                 }}
-
               </Route>
             </Switch>
 
@@ -126,22 +111,21 @@ const App: (React.FC) = props => {
               />
             </Drawer>
           </MobileView>
-
         </Row>
       </Router>
 
       {showModalCategory && (
         <ModalCategory
-        categoryModalTitle={categoryModalTitle}
-        categoryId={categoryId}
-        setCategoryId={setCategoryId}
-        showModalCategory={showModalCategory}
-        setShowModalCategory={setShowModalCategory}
-        categoriesList={categoriesList}
-        setCategoriesList={setCategoriesList}
-        categoryTitle={categoryTitle}
-        setCategoryTitle={setCategoryTitle}
-      />
+          categoryModalTitle={categoryModalTitle}
+          categoryId={categoryId}
+          setCategoryId={setCategoryId}
+          showModalCategory={showModalCategory}
+          setShowModalCategory={setShowModalCategory}
+          categoriesList={categoriesList}
+          setCategoriesList={setCategoriesList}
+          categoryTitle={categoryTitle}
+          setCategoryTitle={setCategoryTitle}
+        />
       )}
 
     </div>

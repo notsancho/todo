@@ -6,7 +6,7 @@ import useForm from 'rc-form-hooks';
 const FormItem = Form.Item;
 
 interface ModalCategoryProps {
-    categoryId: number|null,
+    categoryId: number | null,
     setCategoryId: any,
     categoriesList: any,
     setCategoriesList: any,
@@ -23,16 +23,31 @@ const ModalCategory = (props: ModalCategoryProps) => {
         title: string;
     }>();
 
-    const handleSubmitForm = (e: React.FormEvent) => {
-        e.preventDefault();
-        validateFields()
-            .then(
-                (e) => addCategory(e.title)
-            )
-            .catch(
-                e => console.error(e.message)
-            );
-    };
+    const createCategory = (list: any, title: string): object => {
+        const newCategory = {
+            id: Date.now() + Math.random(),
+            title: title,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        };
+        list.push(newCategory);
+
+        return list;
+    }
+
+    const updateCategory = (list: any, title: string): object => {
+        list.some((array: any, key: number) => {
+            if (array.id == props.categoryId) {
+                list[key] = {
+                    id: props.categoryId,
+                    title: title,
+                    updatedAt: Date.now()
+                };
+            }
+        });
+
+        return list;
+    }
 
     const checkCategory = (title: string) => {
         if (props.categoriesList === null) {
@@ -44,7 +59,7 @@ const ModalCategory = (props: ModalCategoryProps) => {
         });
     }
 
-    const addCategory = (title: string) => {
+    const saveCategory = (title: string): void => {
 
         if (title !== "") {
             if (checkCategory(title)) {
@@ -56,27 +71,12 @@ const ModalCategory = (props: ModalCategoryProps) => {
                 let list = props.categoriesList || [];
 
                 if (props.categoryId !== null) {
-                    list.some((array: any, key: number) => {
-                        if (array.id == props.categoryId) {
-                            list[key] = {
-                                id: props.categoryId,
-                                title: title,
-                                updatedAt: Date.now()
-                            };
-                        }
-                    });
+                    list = updateCategory(list, title);
                 } else {
-                    
-                    const newCategory = {
-                        id: Date.now() + Math.random(),
-                        title: title,
-                        createdAt: Date.now(),
-                        updatedAt: Date.now()
-                    };
-                    list.push(newCategory);
+                    list = createCategory(list, title);
                 }
-                
-                list = list.filter(function (el: any) {
+
+                list = list.filter(function (el: object) {
                     return el != null;
                 });
 
@@ -89,9 +89,19 @@ const ModalCategory = (props: ModalCategoryProps) => {
 
     }
 
+    const handleSubmitForm = (e: React.FormEvent): void => {
+        e.preventDefault();
+        validateFields()
+            .then(
+                (e) => saveCategory(e.title)
+            )
+            .catch(
+                e => console.error(e.message)
+            );
+    };
+
     return (
         <Modal
-            title="Category"
             visible={props.showModalCategory}
             onCancel={() => props.setShowModalCategory(!props.showModalCategory)}
             onOk={handleSubmitForm}

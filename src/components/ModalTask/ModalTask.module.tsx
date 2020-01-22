@@ -11,7 +11,7 @@ interface ModalTaskProps {
     priorityLevel: number,
     showModal: boolean,
     handleCancelModal: any,
-    addTask: any,
+    saveTask: any,
     setPriorityLevel: any,
     setTitle: any,
     setDescription: any,
@@ -25,19 +25,19 @@ const marks = {
     100: '100'
 };
 
-const ModalTask = (props:ModalTaskProps) => {
+const ModalTask = (props: ModalTaskProps) => {
 
     const { getFieldDecorator, validateFields, errors, values } = useForm<{
         title: string;
-        description: string;
+        description?: string;
     }>();
 
-    const handleSubmitForm = (e: React.FormEvent) => {
+    const handleSubmitForm = (e: React.FormEvent): void => {
         e.preventDefault();
         validateFields()
             .then(
                 (e) => {
-                    props.addTask(e.title, e.description);
+                    props.saveTask(e.title, e.description);
                 }
             )
             .catch(
@@ -49,7 +49,6 @@ const ModalTask = (props:ModalTaskProps) => {
 
     return (
         <Modal
-            title={props.title}
             visible={props.showModal}
             onCancel={props.handleCancelModal}
             onOk={(e) => handleSubmitForm(e)}
@@ -60,16 +59,16 @@ const ModalTask = (props:ModalTaskProps) => {
                         initialValue: props.title,
                         rules: [{ required: true, message: 'Please input a task title (min: 3)', min: 3, max: 40 }],
                     })(
-                        <Input onChange={(e)=>{props.setTitle(e.target.value)}} />
+                        <Input onChange={(e) => { props.setTitle(e.target.value) }} />
                     )}
                 </FormItem>
 
                 <FormItem label="Description" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
                     {getFieldDecorator('description', {
                         initialValue: props.description,
-                        rules: [{ required: true, message: 'Please input a task description (min: 3)', min: 3, max: 40 }],
+                        rules: [{ required: false, message: 'Please input a task description (min: 3)', min: 3, max: 40 }],
                     })(
-                        <TextArea onChange={(e)=>{props.setDescription(e.target.value)}} />
+                        <TextArea onChange={(e) => { props.setDescription(e.target.value) }} />
                     )}
                 </FormItem>
 

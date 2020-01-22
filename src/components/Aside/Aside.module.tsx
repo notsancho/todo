@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Menu, Button, Input } from 'antd';
 import {
     Link
@@ -13,11 +13,9 @@ interface HooksProps {
 const Aside = (props: HooksProps) => {
     const [heightMenu, setHeightMenu] = useState(window.innerHeight - 30);
 
-    const handleResize = () => {
+    useEffect(() => {
         setHeightMenu(window.innerHeight - 20);
-    }
-
-    window.addEventListener('resize', handleResize);
+    }, []);
 
     return (
         <div className="aside">
@@ -32,7 +30,7 @@ const Aside = (props: HooksProps) => {
                 ))}
             </Menu>
 
-            <Button type="primary" className="add" onClick={() => {props.showCategoryForm(null)}}>
+            <Button type="primary" className="add" onClick={() => { props.showCategoryForm(null) }}>
                 Add
             </Button>
 
