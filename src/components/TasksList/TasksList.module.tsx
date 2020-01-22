@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { PageHeader, Card, Modal, Button, Row, Col } from 'antd';
+import { PageHeader, Card, Modal, Button, Row, Col, List } from 'antd';
 import localforage from "localforage";
-import useForm from 'rc-form-hooks';
 import { withRouter } from "react-router";
 import {
     useParams
@@ -9,7 +8,7 @@ import {
 import ModalTask from '../ModalTask/ModalTask.module';
 
 interface TasksListProps {
-    categoryTitle: string,
+    categoryTitle: any,
     setCategoryTitle: any,
     categoriesList: any,
     setCategoriesList: any,
@@ -20,6 +19,10 @@ const TasksList = (props:any) => {
     const [showModal, setShowModal] = useState<boolean>(false);
 
     const [tasksList, setTasksList] = useState<any>([]);
+    const [currentTasksList, setCurrentTasksList] = useState<any>([]);
+    // const [tasksListPart, setTasksListPart] = useState<any>([]);
+    // const [startLoadTasks, setStartLoadTasks] = useState<number>(0);
+    // const [limitLoadTasks, setLimitLoadTasks] = useState<number>(20);
 
     const [taskId, setTaskId] = useState<number | null>();
     const [title, setTitle] = useState<string>('');
@@ -28,24 +31,71 @@ const TasksList = (props:any) => {
 
     const { categoryId } = useParams();
 
-    localforage.getItem('tasksList').then((list: any) => {
-        setTasksList(list);
-    });
+    useEffect(() => {
+        localforage.getItem('tasksList').then((list: any) => {
+            setTasksList(list);
+        });
+    }, [])
+
+    useEffect(() => {
+        
+        let currentTasksList = tasksList.map((array: any, key: number) => {
+            if (array.categoryId === categoryId) {
+                return array;
+            }
+        })
+
+        currentTasksList = currentTasksList.filter(function (el: any) {
+            return el != null;
+        });
+
+        let byPriorityLevel = currentTasksList.slice(0);
+
+        byPriorityLevel.sort(function (a: any, b: any) {
+            return b.priorityLevel - a.priorityLevel;
+        });
+
+        console.log(byPriorityLevel, '888');
+
+        setCurrentTasksList(byPriorityLevel);
+
+    }, [props.categoryTitle]);
+
+    const onWheelList = (event: object) => {
+        const tasksListPart = tasksList.slice(0, 3);
+        console.log(tasksList);
+
+        tasksList.map((array: any, key: number) => {
+            if (array.categoryId === categoryId) {
+                return (<Col span={6} key={key}>
+                    <Card
+                        title={
+                            array.title
+                        }
+                        extra={[
+                            <Button type="primary" key="0" icon="edit" onClick={() => { editTask(array.id) }} />,
+                            <Button type="danger" key="1" icon="close" onClick={() => { confirmDeleteTask(array.id) }} />
+                        ]}
+                    >
+                        priorityLevel: {array.priorityLevel}<br />
+                        description: {array.description}<br />
+                        createdAt: {array.createdAt}<br />
+                        updatedAt: {array.updatedAt}<br />
+                    </Card>
+                </Col>);
+            }
+            return false;
+        })
+    }
 
     useEffect(() => {
         props.categoriesList.some((array: any, key: number) => {
-            if (array.id == categoryId) {
+            if (array.id === categoryId) {
                 props.setCategoryTitle(array.title);
             }
         });
     }, [categoryId, props]);
     
-
-    // const { getFieldDecorator, validateFields, errors, values } = useForm<{
-    //     title: string;
-    //     description?: string;
-    // }>();
-
     const showModalSaveTask = (): void => {
         setTaskId(null);
         setTitle("");
@@ -75,7 +125,7 @@ const TasksList = (props:any) => {
 
     const updateTask = (list: any, title: string, description: string): object => {
         list.some((array: any, key: number) => {
-            if (array.id == taskId) {
+            if (array.id === taskId) {
                 list[key] = {
                     id: taskId || Date.now() + Math.random(),
                     categoryId: categoryId,
@@ -118,7 +168,7 @@ const TasksList = (props:any) => {
 
     const editTask = (id: number): void => {
         tasksList.some((array: any, key: number) => {
-            if (array.id == id) {
+            if (array.id === id) {
                 setTaskId(id);
                 setTitle(array.title);
                 setDescription(array.description);
@@ -132,7 +182,7 @@ const TasksList = (props:any) => {
 
     const deleteTask = (id: number): void => {
         tasksList.some((array: any, key: number) => {
-            if (array.id == id) {
+            if (array.id === id) {
                 delete tasksList[key];
             }
         });
@@ -161,7 +211,7 @@ const TasksList = (props:any) => {
 
     const deleteCategory = (): void => {
         props.categoriesList.some((array: any, key: number) => {
-            if (array.id == categoryId) {
+            if (array.id === categoryId) {
                 delete props.categoriesList[key];
             }
         });
@@ -173,7 +223,7 @@ const TasksList = (props:any) => {
 
 
         tasksList.some((array: any, key: number) => {
-            if (array.categoryId == categoryId) {
+            if (array.categoryId === categoryId) {
                 delete tasksList[key];
             }
         });
@@ -199,7 +249,7 @@ const TasksList = (props:any) => {
     }
 
     return (
-        <div>
+        <div className="wrap-right" onWheel={event => onWheelList(event)}>
             <PageHeader
                     style={{
                         border: '1px solid rgb(235, 237, 240)',
@@ -211,10 +261,11 @@ const TasksList = (props:any) => {
                     ]}
                 />
 
+            <Button type="primary" shape="circle" size="large" onClick={showModalSaveTask}>Add</Button>
 
             <Row gutter={[16, 16]}>
                 {(tasksList !== null) && tasksList.map((array: any, key: number) => {
-                    if (array.categoryId == categoryId) {
+                    if (array.categoryId === categoryId) {
                         return (<Col span={6} key={key}>
                             <Card
                                 title={
@@ -235,8 +286,6 @@ const TasksList = (props:any) => {
                     return false;
                 })}
             </Row>
-
-            <Button type="primary" shape="circle" size="large" onClick={showModalSaveTask} style={{ float: 'right' }}>Add</Button>
 
             {showModal && (
                 <ModalTask

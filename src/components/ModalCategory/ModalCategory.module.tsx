@@ -19,7 +19,7 @@ interface ModalCategoryProps {
 
 const ModalCategory = (props: ModalCategoryProps) => {
 
-    const { getFieldDecorator, validateFields, errors, values } = useForm<{
+    const { getFieldDecorator, validateFields } = useForm<{
         title: string;
     }>();
 
@@ -37,7 +37,7 @@ const ModalCategory = (props: ModalCategoryProps) => {
 
     const updateCategory = (list: any, title: string): object => {
         list.some((array: any, key: number) => {
-            if (array.id == props.categoryId) {
+            if (array.id === props.categoryId) {
                 list[key] = {
                     id: props.categoryId,
                     title: title,

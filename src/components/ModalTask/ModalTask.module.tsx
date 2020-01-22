@@ -27,7 +27,7 @@ const marks = {
 
 const ModalTask = (props: ModalTaskProps) => {
 
-    const { getFieldDecorator, validateFields, errors, values } = useForm<{
+    const { getFieldDecorator, validateFields } = useForm<{
         title: string;
         description?: string;
     }>();

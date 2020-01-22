@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Menu, Button, Input } from 'antd';
+import { Menu, Button } from 'antd';
 import {
     Link
 } from "react-router-dom";
@@ -11,7 +11,7 @@ interface HooksProps {
 }
 
 const Aside = (props: HooksProps) => {
-    const [heightMenu, setHeightMenu] = useState(window.innerHeight - 30);
+    const [heightMenu, setHeightMenu] = useState<number>(window.innerHeight - 30);
 
     useEffect(() => {
         setHeightMenu(window.innerHeight - 20);
