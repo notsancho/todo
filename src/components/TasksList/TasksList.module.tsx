@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { PageHeader, Card, Modal, Button, Row, Col, List } from 'antd';
 import localforage from "localforage";
 import { withRouter } from "react-router";
@@ -20,16 +20,30 @@ const TasksList = (props:any) => {
 
     const [tasksList, setTasksList] = useState<any>([]);
     const [currentTasksList, setCurrentTasksList] = useState<any>([]);
-    // const [tasksListPart, setTasksListPart] = useState<any>([]);
-    // const [startLoadTasks, setStartLoadTasks] = useState<number>(0);
-    // const [limitLoadTasks, setLimitLoadTasks] = useState<number>(20);
+    const [tasksListPart, setTasksListPart] = useState<any>([]);
+    const [startLoadTasks, setStartLoadTasks] = useState<number>(16);
+    const [limitLoadTasks, setLimitLoadTasks] = useState<number>(4);
 
     const [taskId, setTaskId] = useState<number | null>();
     const [title, setTitle] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const [priorityLevel, setPriorityLevel] = useState<any>(50);
 
+    const [heightWrapList, setHeightWrapList] = useState<number>(0);
+    const [heightWindow, setHeightWindow] = useState<number>(0);
+
+    const ref = useRef<any>(null);
+
     const { categoryId } = useParams();
+
+    useEffect(() => {
+        setHeightWrapList(ref.current.clientHeight);
+        setHeightWindow(document.body.clientHeight);
+    })
+
+    useEffect(() => {
+        setTasksListPart(tasksList.slice(0, 16));
+    }, [tasksList])
 
     useEffect(() => {
         localforage.getItem('tasksList').then((list: any) => {
@@ -55,37 +69,16 @@ const TasksList = (props:any) => {
             return b.priorityLevel - a.priorityLevel;
         });
 
-        console.log(byPriorityLevel, '888');
-
         setCurrentTasksList(byPriorityLevel);
 
     }, [props.categoryTitle]);
 
     const onWheelList = (event: object) => {
-        const tasksListPart = tasksList.slice(0, 3);
-        console.log(tasksList);
-
-        tasksList.map((array: any, key: number) => {
-            if (array.categoryId === categoryId) {
-                return (<Col span={6} key={key}>
-                    <Card
-                        title={
-                            array.title
-                        }
-                        extra={[
-                            <Button type="primary" key="0" icon="edit" onClick={() => { editTask(array.id) }} />,
-                            <Button type="danger" key="1" icon="close" onClick={() => { confirmDeleteTask(array.id) }} />
-                        ]}
-                    >
-                        priorityLevel: {array.priorityLevel}<br />
-                        description: {array.description}<br />
-                        createdAt: {array.createdAt}<br />
-                        updatedAt: {array.updatedAt}<br />
-                    </Card>
-                </Col>);
-            }
-            return false;
-        })
+        if ((window.scrollY + heightWindow) > heightWrapList-200) {
+            const tasksListPart = tasksList.slice(0, startLoadTasks+limitLoadTasks);
+            setTasksListPart(tasksListPart);
+            setStartLoadTasks(startLoadTasks+limitLoadTasks);
+        }
     }
 
     useEffect(() => {
@@ -249,7 +242,7 @@ const TasksList = (props:any) => {
     }
 
     return (
-        <div className="wrap-right" onWheel={event => onWheelList(event)}>
+        <div className="wrap-right" ref={ref} onWheel={event => onWheelList(event)}>
             <PageHeader
                     style={{
                         border: '1px solid rgb(235, 237, 240)',
@@ -264,26 +257,23 @@ const TasksList = (props:any) => {
             <Button type="primary" shape="circle" size="large" onClick={showModalSaveTask}>Add</Button>
 
             <Row gutter={[16, 16]}>
-                {(tasksList !== null) && tasksList.map((array: any, key: number) => {
-                    if (array.categoryId === categoryId) {
-                        return (<Col span={6} key={key}>
-                            <Card
-                                title={
-                                    array.title
-                                }
-                                extra={[
-                                    <Button type="primary" key="0" icon="edit" onClick={() => { editTask(array.id) }} />,
-                                    <Button type="danger" key="1" icon="close" onClick={() => { confirmDeleteTask(array.id) }} />
-                                ]}
-                            >
-                                priorityLevel: {array.priorityLevel}<br />
-                                description: {array.description}<br />
-                                createdAt: {array.createdAt}<br />
-                                updatedAt: {array.updatedAt}<br />
-                            </Card>
-                        </Col>);
-                    }
-                    return false;
+                {(tasksListPart !== null) && tasksListPart.map((array: any, key: number) => {
+                    return (<Col span={6} key={key}>
+                        <Card
+                            title={
+                                array.title
+                            }
+                            extra={[
+                                <Button type="primary" key="0" icon="edit" onClick={() => { editTask(array.id) }} />,
+                                <Button type="danger" key="1" icon="close" onClick={() => { confirmDeleteTask(array.id) }} />
+                            ]}
+                        >
+                            priorityLevel: {array.priorityLevel}<br />
+                            description: {array.description}<br />
+                            createdAt: {array.createdAt}<br />
+                            updatedAt: {array.updatedAt}<br />
+                        </Card>
+                    </Col>);
                 })}
             </Row>
 
