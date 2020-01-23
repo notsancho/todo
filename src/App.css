@@ -14,9 +14,25 @@ body{
   bottom: 0;
   width: 100%;
 }
-.add-task-button{
+.wrap-right{
+  margin-left: -1px;
+}
+.wrap-right .ant-page-header{
+  margin-bottom: 20px;
+}
+.ant-btn.add-task-button{
   position: fixed;
-  right: 15px;
-  bottom: 15px;
+  right: 25px;
+  bottom: 25px;
   z-index: 3;
+  box-shadow: 0 0 20px 20px #fff;
+  height: 60px;
+  width: 60px;
+}
+.item-task .ant-btn{
+  opacity: 0;
+  margin-left: 5px;
+}
+.item-task:hover .ant-btn{
+  opacity: 1;
 }
