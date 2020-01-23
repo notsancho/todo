@@ -2,9 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { PageHeader, Card, Modal, Button, Row, Col } from 'antd';
 import localforage from "localforage";
 import { withRouter } from "react-router";
-import {
-    useParams
-} from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ModalTask from '../ModalTask/ModalTask.module';
 
 interface TasksListProps {
@@ -15,7 +13,7 @@ interface TasksListProps {
     showCategoryForm: any,
 }
 
-const TasksList = (props:any) => {
+const TasksList = (props: any) => {
     const [showModal, setShowModal] = useState<boolean>(false);
 
     const [tasksList, setTasksList] = useState<any>([]);
@@ -71,10 +69,10 @@ const TasksList = (props:any) => {
     }, [props.categoryTitle, tasksList]);
 
     const onWheelList = (event: object) => {
-        if ((window.scrollY + heightWindow) > heightWrapList-200) {
-            const tasksListPart = currentTasksList.slice(0, startLoadTasks+limitLoadTasks);
+        if ((window.scrollY + heightWindow) > heightWrapList - 200) {
+            const tasksListPart = currentTasksList.slice(0, startLoadTasks + limitLoadTasks);
             setTasksListPart(tasksListPart);
-            setStartLoadTasks(startLoadTasks+limitLoadTasks);
+            setStartLoadTasks(startLoadTasks + limitLoadTasks);
         }
     }
 
@@ -85,7 +83,7 @@ const TasksList = (props:any) => {
             }
         });
     }, [categoryId, props]);
-    
+
     const showModalSaveTask = (): void => {
         setTaskId(null);
         setTitle("");
@@ -241,21 +239,21 @@ const TasksList = (props:any) => {
     return (
         <div className="wrap-right" ref={ref} onWheel={event => onWheelList(event)}>
             <PageHeader
-                    style={{
-                        border: '1px solid rgb(235, 237, 240)',
-                    }}
-                    title={props.categoryTitle}
-                    extra={[
-                        <Button type="primary" key="0" icon="edit" onClick={() => { props.showCategoryForm(categoryId) }} />,
-                        <Button type="danger" key="1" icon="close" onClick={() => { confirmDeleteCategory() }} />
-                    ]}
-                />
+                style={{
+                    border: '1px solid rgb(235, 237, 240)',
+                }}
+                title={props.categoryTitle}
+                extra={[
+                    <Button type="primary" key="0" icon="edit" onClick={() => { props.showCategoryForm(categoryId) }} />,
+                    <Button type="danger" key="1" icon="close" onClick={() => { confirmDeleteCategory() }} />
+                ]}
+            />
 
             <Button type="primary" shape="circle" size="large" onClick={showModalSaveTask} className="add-task-button">Add</Button>
 
             <Row gutter={[16, 16]}>
                 {(tasksListPart !== null) && tasksListPart.map((array: any, key: number) => {
-                    return (<Col xs={{span: 24}} sm={{span: 12}} lg={{span: 6}} key={key}>
+                    return (<Col xs={{ span: 24 }} sm={{ span: 12 }} lg={{ span: 6 }} key={key}>
                         <Card
                             title={
                                 array.title

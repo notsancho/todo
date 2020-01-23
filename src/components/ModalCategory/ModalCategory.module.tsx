@@ -1,6 +1,5 @@
 import React from 'react';
 import { Form, Modal, Input } from 'antd';
-
 import localforage from "localforage";
 import useForm from 'rc-form-hooks';
 const FormItem = Form.Item;

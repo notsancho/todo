@@ -54,7 +54,7 @@ const App: (React.FC) = props => {
           <BrowserView>
             <Col span={18} push={6}>
               <Switch>
-                <Route exact path="/tasklist/:categoryId">
+                <Route exact path="/category/:categoryId">
                   {() => {
                     if (categoriesList.length) {
                       return <TasksList
@@ -78,9 +78,9 @@ const App: (React.FC) = props => {
             </Col>
           </BrowserView>
           <MobileView>
-            
+
             <Button type="primary" onClick={() => setAsideVisible(!asideVisible)}>
-            Show categories
+              Show categories
             </Button>
 
             <Switch>

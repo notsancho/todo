@@ -1,6 +1,5 @@
 import React from 'react';
 import { Form, Modal, Input, Slider } from 'antd';
-
 import useForm from 'rc-form-hooks';
 import TextArea from 'antd/lib/input/TextArea';
 const FormItem = Form.Item;

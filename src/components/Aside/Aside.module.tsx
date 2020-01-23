@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Button } from 'antd';
-import {
-    Link
-} from "react-router-dom";
+import { Link } from "react-router-dom";
 
-interface HooksProps {
+interface AsideProps {
     categoriesList: any,
     setCategoriesList: any,
     showCategoryForm: any,
 }
 
-const Aside = (props: HooksProps) => {
+const Aside = (props: AsideProps) => {
     const [heightMenu, setHeightMenu] = useState<number>(window.innerHeight - 30);
 
     useEffect(() => {
@@ -23,7 +21,7 @@ const Aside = (props: HooksProps) => {
             <Menu mode="inline" style={{ height: heightMenu }}>
                 {(props.categoriesList !== null) && props.categoriesList.map((array: any, key: number) => (
                     <Menu.Item key={key}>
-                        <Link to={`/tasklist/${array.id}`}>
+                        <Link to={`/category/${array.id}`}>
                             {array.title}
                         </Link>
                     </Menu.Item>
