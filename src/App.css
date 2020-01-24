@@ -3,7 +3,7 @@ body, html, #root, .wrap-todo, .wrap-todo .ant-row, .ant-row .wrap-aside {
 }
 body{
   padding: 10px;
-  background: url(../src/images/bg.jpg);
+  background: url(../src/images/bg.jpg) fixed;
   background-size: cover;
   color: #295277;
 }
