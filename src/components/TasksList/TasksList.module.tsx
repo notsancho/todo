@@ -273,6 +273,9 @@ const TasksList = (props: any) => {
                             ]}
                             className="item-task"
                         >
+                            {array.description && (
+                                <div className="task-description">{array.description}</div>
+                            )}
                             {/* priorityLevel: {array.priorityLevel}<br />
                             description: {array.description}<br />
                             createdAt: {array.createdAt}<br />
