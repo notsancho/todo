@@ -54,7 +54,7 @@ const App: (React.FC) = props => {
           <BrowserView>
             <Col span={18} push={6}>
               <Switch>
-                <Route exact path="/category/:categoryId">
+                <Route exact path="/category/:categoryIdParam">
                   {() => {
                     if (categoriesList.length) {
                       return <TasksList
@@ -84,7 +84,7 @@ const App: (React.FC) = props => {
             </Button>
 
             <Switch>
-              <Route exact path="/tasklist/:categoryId">
+              <Route exact path="/category/:categoryIdParam">
                 {() => {
                   if (categoriesList.length) {
                     return <TasksList

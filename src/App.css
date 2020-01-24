@@ -3,22 +3,41 @@ body, html, #root, .wrap-todo, .wrap-todo .ant-row, .ant-row .wrap-aside {
 }
 body{
   padding: 10px;
+  background: url(../src/images/bg.jpg);
+  background-size: cover;
+  color: #295277;
+}
+body .ant-card-head-title, body .ant-page-header-heading-title{
+  color: #295277;
+}
+body .ant-card-head-title{
+  padding-left: 20px;
 }
 .aside{
   height: 100%;
   position: relative;
   overflow: auto;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+.aside .ant-menu{
+  background: #e8e8e8b5;
 }
 .aside .add{
   position: absolute;
   bottom: 0;
   width: 100%;
 }
+.aside a{
+  font-weight: 500;
+}
 .wrap-right{
   margin-left: -1px;
 }
 .wrap-right .ant-page-header{
   margin-bottom: 20px;
+  background: #e8e8e8b5;
+  border-radius: 5px;
 }
 .ant-btn.add-task-button{
   position: fixed;
@@ -28,6 +47,9 @@ body{
   box-shadow: 0 0 20px 20px #fff;
   height: 60px;
   width: 60px;
+  font-size: 22px;
+  background: rgb(245, 106, 0);
+  border: 1px solid rgb(245, 106, 0);
 }
 .item-task .ant-btn{
   opacity: 0;
@@ -35,4 +57,26 @@ body{
 }
 .item-task:hover .ant-btn{
   opacity: 1;
+}
+.wrap-todo .ant-card{
+  background: #e8e8e8b5;
+}
+.wrap-todo .ant-card-body{
+  padding: 0;
+}
+.wrap-todo .delete-task{
+  position: absolute;
+  opacity: 1;
+  left: 0;
+  border-radius: 100%;
+  margin-left: 10px;
+  background-color: #a5c0d6;
+  border: 1px solid #fff;
+  padding: 0;
+  height: 28px;
+  width: 28px;
+}
+.wrap-todo .delete-task.active{
+  background-color: rgb(82, 196, 26);
+  border: 1px solid rgb(82, 196, 26);
 }
